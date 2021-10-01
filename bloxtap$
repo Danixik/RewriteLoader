@@ -1,25 +1,47 @@
-
-_G['bloxtapusername'] = 'poop free'
+_G['bloxtapusername'] = "welcome ".. game.Players.LocalPlayer.Name..' by bruhmod#5212'
 for i,v in pairs(game:GetService("CoreGui"):GetChildren()) do
 	if v.Name == "bloxtap" then
 		v:Destroy()
 	end
 end
+local scrollon = nil
+local selectingcolor = false
+local latestCode = ''
+local TweenService = game:GetService("TweenService")
+ local UserInputService = game:GetService("UserInputService")
+local rs = game:GetService('RunService')
 local CC = Instance.new('ColorCorrectionEffect',game.Lighting)
 local lplr = game:GetService("Players").LocalPlayer
 local m = lplr:GetMouse()
 local bloxtap = Instance.new("ScreenGui")
 bloxtap.IgnoreGuiInset = true
-local fovview = Instance.new("ImageLabel")
-fovview.Name = "fovview"
-fovview.Parent = bloxtap
-fovview.AnchorPoint = Vector2.new(0.5, 0.5)
-fovview.BackgroundColor3 = Color3.new(1, 1, 1)
-fovview.BackgroundTransparency = 1
-fovview.Position = UDim2.new(0.5, 0, 0.5, 0)
-fovview.Size = UDim2.new(0, 25, 0, 25)
-fovview.Image = "http://www.roblox.com/asset/?id=282305376"
-fovview.ImageTransparency = 0.5
+
+local drawingtrack = {}
+
+local fovview = Drawing.new('Circle')
+local ABS = Instance.new("ScreenGui",game.Players.LocalPlayer.PlayerGui).AbsoluteSize
+fovview.Radius = 25
+fovview.Filled = false
+fovview.Thickness = 0.1
+fovview.Visible = true
+fovview.Color = Color3.fromRGB(255,255,255);
+
+local logs = Instance.new("TextLabel")
+
+logs.Name = "logs"
+logs.Parent = bloxtap
+logs.BackgroundColor3 = Color3.new(1, 1, 1)
+logs.BackgroundTransparency = 1
+logs.Position = UDim2.new(0, 25, 0, 0)
+logs.Size = UDim2.new(0, 300, 0, 150)
+logs.Font = Enum.Font.GothamSemibold
+logs.Text = ""
+logs.TextColor3 = Color3.new(1, 1, 1)
+logs.TextSize = 12
+logs.TextStrokeTransparency = 0.80000001192093
+logs.TextXAlignment = Enum.TextXAlignment.Left
+logs.TextYAlignment = Enum.TextYAlignment.Bottom
+logs.Visible = false
 
 local main = Instance.new("ImageLabel")
 local body = Instance.new("ImageLabel")
@@ -68,7 +90,7 @@ local lines = Instance.new("Folder")
 bloxtap.Name = "bloxtap"
 bloxtap.Parent = game:GetService("CoreGui")
 bloxtap.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-bloxtap.DisplayOrder = 1000000
+bloxtap.DisplayOrder = 2
 
 main.Name = "main"
 main.Parent = bloxtap
@@ -110,7 +132,7 @@ hackname.Size = UDim2.new(0, 75, 0, 39)
 hackname.Font = Enum.Font.GothamBold
 hackname.Text = "DanixLoader"
 hackname.TextColor3 = Color3.new(1, 1, 1)
-hackname.TextSize = 17
+hackname.TextSize = 11
 hackname.TextStrokeTransparency = 0.94999998807907
 hackname.TextXAlignment = Enum.TextXAlignment.Right
 
@@ -731,10 +753,14 @@ line.ZIndex = 100
 local configfolder = Instance.new("Folder",bloxtap)
 configfolder.Name = "configfolder"
 
-get = function(str)
-	local r = loadstring(game:HttpGet("http://rustedstyle.com/bloxtap_assets/"..str..'.lua',true))()
-	return r
-end
+--[[function refreshSizeTAB(tab)
+	for i,v in pairs(tab:GetDescendants()) do
+		local check = collumnBox.Position.Y.Offset+collumnBox.Size.Y.Offset
+		if check > 265 then
+		
+		end
+	end
+end--]]
 
 antiaim.MouseButton1Click:connect(function()
 	selection:TweenPosition(UDim2.new(0,antiaim.Position.X.Offset+7,0,10),"Out","Quad",0.1,true,nil)
@@ -807,7 +833,7 @@ function addcategory(info)
 	scrolldesign.ImageColor3 = Color3.new(0.121569, 0.129412, 0.156863)
 	scrolldesign.ScaleType = Enum.ScaleType.Slice
 	scrolldesign.SliceCenter = Rect.new(12, 12, 13, 13)
-	
+		
 	top.Name = "top"
 	top.Parent = category
 	top.BackgroundColor3 = Color3.new(1, 0.784314, 0.403922)
@@ -849,9 +875,9 @@ function addcategory(info)
 	
 	UIListLayout.Parent = content
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	
 	return content
 end
+local dropdownOpen = false
 function addbutton(info,callback)
 	callback = callback or function() end
 	local button = Instance.new("Frame")
@@ -874,10 +900,369 @@ function addbutton(info,callback)
 	real.TextSize = 11
 	
 	real.TextColor3 = Color3.fromRGB(250, 250, 250)
-	real.MouseButton1Click:connect(callback)
+	real.MouseButton1Click:connect(function()
+		if dropdownOpen == false then
+			callback()
+		end
+	end)
 	
 	real.MouseEnter:connect(function() real.TextColor3 = Color3.fromRGB(255, 200, 103) end)
 	real.MouseLeave:connect(function() real.TextColor3 = Color3.new(0.980392, 0.980392, 0.980392) end)
+	
+	return button
+end
+
+
+
+function addcolorselectionbutton(info,callback)
+	callback = callback or function() end
+	local selectcolor = Instance.new("ImageButton")
+	selectcolor.Name = "selectcolor"
+	selectcolor.Parent = info['parent']
+	selectcolor.BackgroundColor3 = Color3.new(1, 1, 1)
+	selectcolor.BackgroundTransparency = 1
+	selectcolor.Position = UDim2.new(0, 170, 0, 0)
+	selectcolor.Size = UDim2.new(0, 35, 0, 18)
+	selectcolor.Image = "rbxassetid://760929926"
+	selectcolor.ImageColor3 = Color3.new(0.576471, 0.501961, 1)
+	selectcolor.ScaleType = Enum.ScaleType.Slice
+	selectcolor.SliceCenter = Rect.new(12, 12, 13, 13)	
+	
+	local colourselection = Instance.new("ImageLabel")
+local body = Instance.new("ImageLabel")
+local colorframe = Instance.new("Frame")
+local show = Instance.new("ImageButton")
+show.Image = ''
+local scrollcolor = Instance.new('Frame')
+local yes = Instance.new("Frame")
+local maincolor = Instance.new("ImageLabel")
+local selectcircle = Instance.new("ImageLabel")
+local dark = Instance.new("ImageLabel")
+colourselection.Name = "colourselection"
+local yeetio = Instance.new('ScreenGui',game:GetService('CoreGui'))
+yeetio.DisplayOrder = 50
+colourselection.Parent = bloxtap --yeetio
+colourselection.BackgroundColor3 = Color3.new(1, 1, 1)
+colourselection.BackgroundTransparency = 1
+colourselection.Position = UDim2.new(0, 50, 0, 0)
+colourselection.Selectable = true
+colourselection.Size = UDim2.new(0, 201, 0, 168)
+colourselection.ZIndex = 1
+colourselection.Image = "rbxassetid://760929926"
+colourselection.ImageColor3 = Color3.new(1, 0.784314, 0.403922)
+colourselection.ScaleType = Enum.ScaleType.Slice
+colourselection.SliceCenter = Rect.new(12, 12, 13, 13)
+colourselection.Visible = false
+colourselection.ZIndex = 100
+
+main:GetPropertyChangedSignal("Visible"):Connect(function()
+	colourselection.Visible = false
+end)
+
+local fap = Instance.new("StringValue",configfolder)
+fap.Name = info['valuename']
+fap.Value = 'return {0.01,1,1}'
+
+body.Name = "body"
+body.Parent = colourselection
+body.BackgroundColor3 = Color3.new(1, 1, 1)
+body.BackgroundTransparency = 1
+body.Position = UDim2.new(0, 1, 0, 1)
+body.Selectable = true
+body.Size = UDim2.new(1, -2, 1, -2)
+body.ZIndex = 1
+body.Image = "rbxassetid://760929926"
+body.ImageColor3 = Color3.new(0.141176, 0.14902, 0.188235)
+body.ScaleType = Enum.ScaleType.Slice
+body.SliceCenter = Rect.new(12, 12, 13, 13)
+
+colorframe.Name = "colorframe"
+colorframe.Parent = body
+colorframe.BackgroundColor3 = Color3.new(1, 1, 1)
+colorframe.BackgroundTransparency = 1
+colorframe.BorderSizePixel = 0
+colorframe.Position = UDim2.new(0, 165, 0, 10)
+colorframe.Size = UDim2.new(0, 20, 0, 145)
+
+show.Name = "show"
+show.Parent = colorframe
+show.AnchorPoint = Vector2.new(0.5, 0.5)
+show.BackgroundColor3 = Color3.new(1, 1, 1)
+show.BorderSizePixel = 0
+show.Position = UDim2.new(0, 10, 0, 72)
+show.Rotation = 90
+show.Size = UDim2.new(0, 145, 0, 20)
+
+scrollcolor.Name = "scrollcolor"
+scrollcolor.Parent = colorframe
+scrollcolor.BackgroundColor3 = Color3.new(1, 1, 1)
+scrollcolor.BorderSizePixel = 0
+scrollcolor.Position = UDim2.new(0, -3, 0, 0)
+scrollcolor.Size = UDim2.new(1, 4, 0, 2)
+
+yes.Name = "yes"
+yes.Parent = body
+yes.BackgroundColor3 = Color3.new(1, 1, 1)
+yes.BorderSizePixel = 0
+yes.Position = UDim2.new(0, 10, 0, 10)
+yes.Size = UDim2.new(0, 145, 0, 145)
+
+maincolor.Name = "maincolor"
+maincolor.Parent = yes
+maincolor.BackgroundColor3 = Color3.new(1, 1, 1)
+maincolor.BackgroundTransparency = 1
+maincolor.Rotation = 90
+maincolor.Size = UDim2.new(1, 0, 1, 0)
+maincolor.ZIndex = 15
+maincolor.Image = "http://www.roblox.com/asset/?id=595695917"
+maincolor.ImageColor3 = Color3.fromHSV(0.01,1,1)
+
+selectcircle.Name = "selectcircle"
+selectcircle.Parent = yes
+selectcircle.BackgroundColor3 = Color3.new(1, 1, 1)
+selectcircle.BackgroundTransparency = 1
+selectcircle.Size = UDim2.new(0, 15, 0, 15)
+selectcircle.ZIndex = 23
+selectcircle.Image = "rbxassetid://3188341304"
+selectcircle.ImageTransparency = 0.25
+selectcircle.ZIndex = 10000000
+
+dark.Name = "dark"
+dark.Parent = yes
+dark.BackgroundColor3 = Color3.new(1, 1, 1)
+dark.BackgroundTransparency = 1
+dark.Position = UDim2.new(0, -1, 0, 0)
+dark.Size = UDim2.new(1, 1, 1, 0)
+dark.ZIndex = 60
+dark.Image = "http://www.roblox.com/asset/?id=595695917"
+dark.ImageColor3 = Color3.new(0, 0, 0)
+dark.ImageTransparency = 0.10000000149012
+
+local gradient = Instance.new('UIGradient',show)
+
+gradient.Color = ColorSequence.new(
+	{
+		ColorSequenceKeypoint.new(0,Color3.fromRGB(255,0,0));
+		ColorSequenceKeypoint.new(0.25,Color3.fromRGB(255,0,255));
+		ColorSequenceKeypoint.new(0.379,Color3.fromRGB(0,0,255));
+		ColorSequenceKeypoint.new(0.534,Color3.fromRGB(0,255,255));
+		ColorSequenceKeypoint.new(0.687,Color3.fromRGB(0,255,0));
+		ColorSequenceKeypoint.new(0.84,Color3.fromRGB(255,255,0));
+		ColorSequenceKeypoint.new(1,Color3.fromRGB(255,0,0));
+	}
+)
+
+local m = game:GetService('Players').LocalPlayer:GetMouse()
+
+function getColor()
+	local selectY = scrollcolor.AbsolutePosition.Y
+	local absY = show.AbsolutePosition.Y - 72.5
+	local poop = (selectY-absY) - 12
+	if poop < 140  and  poop > 0  then
+		return poop/140
+	elseif poop <= 0 then
+		return 0.1
+	elseif poop >= 140 then
+		return 1
+	end
+end
+local value = 1
+local saturation = 1
+function getColorPosition()
+	local mousepos = Vector2.new(m.X,m.Y)
+	local yespos = yes.AbsolutePosition
+	
+	local x;
+	local xraw = (mousepos.X-yespos.X)
+	if xraw < 145  and  xraw > 0  then
+		x = xraw/145
+	elseif xraw <= 0 then
+		x = 0
+	elseif xraw >= 145 then
+		x = 1
+	end
+	local y;
+	local yraw = (mousepos.Y-yespos.Y)
+	if yraw < 145  and  yraw > 0  then
+		y = yraw/145
+	elseif yraw <= 0 then
+		y = 0
+	elseif yraw >= 145 then
+		y = 1
+	end
+	local sat = 1-x
+	local val = 1-y
+	
+	return sat,val
+end
+
+local focus = false;
+
+
+local inputService = game:GetService('UserInputService');
+local function Input(input, gameProcessedEvent)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		if focus == false then
+			colourselection.Visible = false
+		end
+	end
+end
+inputService.InputBegan:Connect(Input)
+
+colourselection.MouseEnter:connect(function()
+	focus = true
+	selectingcolor = true
+end)
+colourselection.MouseLeave:connect(function()
+	focus = false
+	selectingcolor = false
+end)
+selectcolor.MouseEnter:connect(function()
+	focus = true
+	selectingcolor = true
+end)
+selectcolor.MouseLeave:connect(function()
+	focus = false
+	selectingcolor = false
+end)
+local huev2 = 0.01
+local function start1()
+	local heartbeat = game:GetService("RunService").Heartbeat;
+	local s, event = pcall(function()
+		return maincolor.MouseEnter
+	end)
+
+	    if s then
+	    	maincolor.Active = true;
+			
+	    	event:connect(function()
+				--focus = true
+	    		local input = inputService.InputBegan:connect(function(key)
+	    			if key.UserInputType == Enum.UserInputType.MouseButton1 then
+						--local lastcolor;
+						--selectingcolor = true
+	    				while heartbeat:wait() and inputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) and colourselection.Visible == true  do
+							local c = getColor()
+							selectingcolor = true
+							--lastcolor = Color3.fromHSV(0.99-c,hue,value)
+							local sat,val = getColorPosition()
+							--selectcircle.Position = UDim2.new(1-sat,0,1-val,0)
+
+							--fap.Value = ('return {'.. tostring(huev2) ..','.. tostring(0.99-c) ..','.. tostring(sat) ..','.. tostring(val) ..'}')
+							--fap.Value = ('return {'.. tostring(huev2) ..','.. tostring(0.99-c) ..','.. tostring(1-_G['sat'..info['valuename']]) ..','.. tostring(1-_G['val'..info['valuename']]) ..'}')
+							local compiled = loadstring(fap.Value)()
+							local hue = compiled[1]
+							fap.Value = 'return {'.. hue ..','.. 1-sat..','.. 1-val..'}'
+						end
+						selectingcolor = false
+						--callback(lastcolor)
+	    			end
+	    		end)
+
+	    		local leave;
+	    		leave = maincolor.MouseLeave:connect(function()
+					--focus = false
+	    			input:disconnect();
+	    			leave:disconnect();
+	    		end)
+	    	end)
+	    end
+	end
+	
+	
+local function start2()
+		local heartbeat = game:GetService("RunService").Heartbeat;
+	local s, event = pcall(function()
+		return colorframe.MouseEnter
+	end)
+
+	    if s then
+	    	colorframe.Active = true;
+
+	    	event:connect(function()
+				--focus = true
+				warn(fap.Value)
+	    		local input = inputService.InputBegan:connect(function(key)
+	    			if key.UserInputType == Enum.UserInputType.MouseButton1 then
+	    				--selectingcolor = true
+						while heartbeat:wait() and inputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) and colourselection.Visible == true do
+							local c = getColor()
+							selectingcolor = true
+							--lastcolor = Color3.fromHSV(0.99-c,hue,value)
+							maincolor.ImageColor3 = Color3.fromHSV(0.99-c,1,1)
+							local mouseY = game:GetService('Players').LocalPlayer:GetMouse().Y
+							local absY = show.AbsolutePosition.Y - 72.5
+							local poop = (mouseY-absY) - 12
+							local hue;
+							if poop < 140  and  poop > 0  then
+								hue = poop/140
+							elseif poop <= 0 then
+								hue = 0
+							elseif poop >= 140 then
+								hue = 1
+							end
+							local compiled = loadstring(fap.Value)()
+							local sat = compiled[2]
+							local val = compiled[3]
+							fap.Value = 'return {'.. hue ..','.. sat..','.. val..'}'
+						end
+						selectingcolor = false
+						--callback(lastcolor)
+	    			end
+	    		end)
+
+	    		local leave;
+	    		leave = colorframe.MouseLeave:connect(function()
+					--focus = false
+	    			input:disconnect();
+	    			leave:disconnect();
+	    		end)
+	    	end)
+	    end
+	end
+	spawn(function() start1() end)
+	spawn(function() start2() end)
+	--spawn(function()
+		--wait(3) -- for the auto load!!!
+	fap:GetPropertyChangedSignal("Value"):Connect(function()
+		--[[warn('value changed!')
+		local uwu = loadstring(fap.Value)()
+		huev2 = uwu[2]
+		local saturation,hue,value = Color3.toHSV(uwu[1])
+		warn('huev2 : '..huev2)
+		warn('saturation : '..saturation)
+		warn('hue : '..hue)
+		warn('value : '..value)
+		maincolor.ImageColor3 = Color3.fromHSV(0.99-huev2,1,1)
+		selectcolor.ImageColor3 = Color3.fromHSV(0.99-huev2,hue,value)
+		scrollcolor.Position = UDim2.new(0, -3, huev2, 0)
+		selectcircle.Position = UDim2.new(1-hue, 0, 1-value, 0)
+		callback(fap.Value)--]]
+		local compiled = loadstring(fap.Value)()
+		local h,s,v = unpack(compiled)
+		
+		selectcircle.Position = UDim2.new(s, 0, v, 0)
+		maincolor.ImageColor3 = Color3.fromHSV(1-h,1,1)
+		scrollcolor.Position = UDim2.new(0, -3, h, 0)
+		selectcolor.ImageColor3 = Color3.fromHSV(1-h,1-s,1-v)
+		
+		warn(h,s,v..' yeeeet')
+		
+		
+		callback(fap.Value)
+	end)
+	
+	selectcolor.MouseButton1Click:connect(function()
+		colourselection.Visible = (not colourselection.Visible)
+		spawn(function()
+			while colourselection.Visible == true do
+				rs.Heartbeat:wait()
+				pcall(function()
+					colourselection:TweenPosition(UDim2.new(0,selectcolor.AbsolutePosition.X+50,0,selectcolor.AbsolutePosition.Y+50),"Out","Quad",0.1,true,nil)
+				end)
+			end
+		end)
+	end)
 end
 
 function addtoggle(info,callback)
@@ -944,6 +1329,7 @@ function addtoggle(info,callback)
 	button.MouseButton1Click:connect(function()
 		fap.Value = (not fap.Value)
 	end)
+	return toggle
 end
 
 function adddropdown(info,callback)
@@ -1031,6 +1417,7 @@ function adddropdown(info,callback)
 		dropbutton.MouseLeave:connect(function() dropbutton.TextColor3 = Color3.new(0.980392, 0.980392, 0.980392) end)
 		dropbutton.MouseButton1Click:Connect(function()
 			fap.Value = tostring(name)
+			dropdownOpen = false
 		end)
 	end
 	
@@ -1043,8 +1430,10 @@ function adddropdown(info,callback)
 	end)
 	
 	click.MouseButton1Click:connect(function()
-		if click.Rotation == 0 then click.Rotation = -180;body.BorderColor3 = Color3.fromRGB(255, 200, 103); drop.Visible = true else click.Rotation = 0; drop.Visible = false;body.BorderColor3 = Color3.fromRGB(54, 57, 64) end
+		if click.Rotation == 0 then dropdownOpen=true;click.Rotation = -180;body.BorderColor3 = Color3.fromRGB(255, 200, 103); drop.Visible = true else dropdownOpen=false;click.Rotation = 0; drop.Visible = false;body.BorderColor3 = Color3.fromRGB(54, 57, 64) end
+		dropdown.ZIndex = workspace.DistributedGameTime
 	end)
+	return dropdown
 end
 local indicator = Instance.new("Frame")
 local value = Instance.new("TextLabel")
@@ -1068,7 +1457,6 @@ value.Font = Enum.Font.GothamSemibold
 value.Text = "69"
 value.TextColor3 = Color3.new(1, 1, 1)
 value.TextSize = 11
-local scrollon = nil
 function addscroll(info,callback)
 	callback = callback or function() end
 	local scrolling = Instance.new("Frame")
@@ -1082,8 +1470,11 @@ function addscroll(info,callback)
 	
 	fap.Changed:connect(function(c)
 		callback(fap.Value)
-		scroll:TweenSize(UDim2.new(fap.value/info['maxed'], 5, 0, 4), 'Out', 'Quad', 0.2, true);
+		scroll:TweenSize(UDim2.new(fap.value/info['maxed'], 12, 0, 4), 'Out', 'Quad', 0.2, true);
 	end)
+	if info['value'] then
+		fap.Value = info['value']
+	end
 	
 	scrolling.Name = "scrolling"
 	scrolling.Parent = info['parent']
@@ -1126,16 +1517,10 @@ function addscroll(info,callback)
 	scroll.ScaleType = Enum.ScaleType.Slice
 	scroll.SliceCenter = Rect.new(12, 12, 13, 13)
 	
-	scroll:TweenSize(UDim2.new((info['value']/info['maxed'])/info['maxed'], 5, 0, 4), 'Out', 'Quad', 0.2, true);
-
+	--scroll:TweenSize(UDim2.new((info['value']/info['maxed'])/info['maxed'], 5, 0, 4), 'Out', 'Quad', 0.2, true);
 	local mouse = game:GetService("Players").LocalPlayer:GetMouse();
-	--[[mouse.Button1Down:connect(function()
-		down = true
-	end)
-	mouse.Button1Up:connect(function()
-		down = false
-		scrollon = false
-	end)--]]
+
+		
 	local inputService = game:GetService('UserInputService');
 	local heartbeat = game:GetService("RunService").Heartbeat;
 	local s, event = pcall(function()
@@ -1184,9 +1569,9 @@ end
 
 local CharacterRage = addcategory({parent=FIRST_rage,title='Character',lenght=100})
 
-addtoggle({parent=CharacterRage,title='Fire Damage Bypass',valuename='antifire'}, function(bruh) end)
+addtoggle({parent=CharacterRage,title='No Fire Damage',valuename='antifire'}, function(bruh) end)
 
-addtoggle({parent=CharacterRage,title='Fall Damage Bypass',valuename='nofalldamage'}, function(bruh) end)
+addtoggle({parent=CharacterRage,title='No Fall Damage',valuename='nofalldamage'}, function(bruh) end)
 
 for i,v in pairs(game:GetService("ReplicatedStorage"):GetDescendants()) do 
 	if v.Name == "WalkSpeed" then 
@@ -1248,7 +1633,7 @@ end)
 addtoggle({parent=GunModRage,title='Instant Kill',valuename='instantkill'}, function(bruh)
 end)
 
-local TrollRage = addcategory({parent=FIRST_rage,title='Troll',lenght=100})
+local TrollRage = addcategory({parent=FIRST_rage,title='Troll',lenght=150})
 
 
 --addtoggle({parent=TrollRage,title='Speed Hack',valuename='speedhack'}, function(bruh) end)
@@ -1258,15 +1643,39 @@ adddropdown({parent=TrollRage,valuename='chattype',list={'Select Chat Type','Ali
 	
 end)
 
+addtoggle({parent=TrollRage,title='Chat Bypass',valuename='chatbypass'}, function(bruh)
+end)
 
-
-addtoggle({parent=TrollRage,title='Grenade Walk',valuename='grenadewalk'}, function(bruh) end)
+addtoggle({parent=TrollRage,title='Grenade Walk',valuename='grenadewalk'}, function(bruh)
+	spawn(function()
+		while wait(1) do
+			if lplr.Character then
+				if _G['property_grenadewalk'] == true then
+					local oh1 = game:GetService("ReplicatedStorage").Weapons[_G['property_grenadewalktype']].Model
+					local oh3 = 25
+					local oh4 = 35
+					local oh6 = ""
+					local oh7 = ""
+					game:GetService("ReplicatedStorage").Events.ThrowGrenade:FireServer(oh1, nil, oh3, oh4, Vector3.new(0,-100,0), oh6, oh7)
+				else
+					break
+				end
+			end
+		end
+	end)
+end)
 
 adddropdown({parent=TrollRage,valuename='grenadewalktype',list={'Molotov','HE Grenade','Smoke Grenade','Decoy Grenade','Flashbang'}},function(y)
 	
 end)
 addtoggle({parent=EnvironmentRage,title='Auto Rejoin',valuename='autorejoin'}, function(bruh) 
 	
+end)
+
+addbutton({parent=EnvironmentRage,text='Rejoin Server'},function()
+	local ts = game:GetService("TeleportService")
+	local p = game:GetService("Players").LocalPlayer 
+	ts:Teleport(game.PlaceId, p)
 end)
 
 addbutton({parent=EnvironmentRage,text='Plant C4'},function()
@@ -1292,8 +1701,10 @@ local c = false
 local d = game:GetService("Players").LocalPlayer
 local e = false
 local f = false
-addbutton({parent=EnvironmentRage,text='Crash Server'},function()
+addbutton({parent=EnvironmentRage,text='Soft Crash Server'},function()
 	if lplr.Character then
+		lplr.Character:SetPrimaryPartCFrame(CFrame.new(lplr.Character.HumanoidRootPart.Position + Vector3.new(0,300,0)))
+		lplr.Character.Head.Anchored = true
 		game:GetService("RunService").RenderStepped:Connect(function()
 			local oh3 = 25
 			local oh4 = 35
@@ -1305,12 +1716,13 @@ addbutton({parent=EnvironmentRage,text='Crash Server'},function()
 		end)
 	end
 end)
+
 addbutton({parent=TrollRage,text='Kill All'},function()
-	for i,v in pairs(game.Players:GetPlayers()) do 
+	for i,v in pairs(game.Players:GetPlayers()) do
 		if v.Character and v ~= game.Players.LocalPlayer and v.TeamColor ~= game.Players.LocalPlayer.TeamColor then
 			local oh1 = v.Character.Head
 			local oh2 = v.Character.Head.CFrame.p
-			local oh3 = "AWP"
+			local oh3 = 'AWP'
 			local oh4 = 4096
 			local oh5 = game.Players.LocalPlayer.Character.Gun
 			local oh8 = 15
@@ -1325,10 +1737,10 @@ addbutton({parent=TrollRage,text='Kill All'},function()
 end)
 addbutton({parent=TrollRage,text='Spawn C4'},function()
 	if game:GetService("Players").LocalPlayer.Character then
-		local oh2 = CFrame.new(workspace.CurrentCamera.CFrame.p,game:GetService("Players").LocalPlayer.Character.Head.CFrame.p + Vector3.new(0, 1.69, 0))
+		local oh2 = CFrame.new(workspace.CurrentCamera.CFrame.p,m.Hit.p)
 		game:GetService("ReplicatedStorage").Events.Drop:FireServer(C4_, oh2, a, b, c, d, e, f)
 	else
-		local oh2 = CFrame.new(workspace.CurrentCamera.CFrame.p, workspace.CurrentCamera.CFrame.p + Vector3.new(0, 1.69, 0))
+		local oh2 = CFrame.new(workspace.CurrentCamera.CFrame.p, workspace.CurrentCamera.CFrame.p)
 		game:GetService("ReplicatedStorage").Events.Drop:FireServer(C4_, oh2, a, b, c, d, e, f)
 	end
 end)
@@ -1343,18 +1755,20 @@ local AimbotLegit = addcategory({parent=FIRST_legit,title='Aimbot',lenght=100})
 
 addtoggle({parent=AimbotLegit,title='Triggerbot',valuename='triggerbot'}, function(bruh) end)
 
-addtoggle({parent=AimbotLegit,title='No Team Check',valuename='noteamcheck'}, function(bruh) end)
+addtoggle({parent=AimbotLegit,title='Free For All',valuename='noteamcheck'}, function(bruh) end)
 
-local SilentAimLegit = addcategory({parent=FIRST_legit,title='Backtracking',lenght=90})
+local BacktrackingLegit = addcategory({parent=FIRST_legit,title='Backtracking',lenght=90})
 
-addtoggle({parent=SilentAimLegit,title='Backtrack',valuename='backtrack'}, function(bruh) end)
+addtoggle({parent=BacktrackingLegit,title='Backtrack',valuename='backtrack'}, function(bruh) end)
+
+
 
 local SilentAimLegit = addcategory({parent=FIRST_legit,title='Silent Aim',lenght=100})
 
 addtoggle({parent=SilentAimLegit,title='Silent Aimbot',valuename='silentaim'}, function(bruh) end)
 
 addscroll({parent=SilentAimLegit,valuename='silentaimfov',title='FOV',maxed=500,value=0},function(y)
-	fovview.Size = UDim2.new(0, y*2, 0, y*2)
+	fovview.Radius = y
 end)
 addscroll({parent=SilentAimLegit,valuename='headshothitchance',title='Headshot Hit Chance',maxed=100,value=0},function(y)
 end)
@@ -1367,16 +1781,15 @@ addscroll({parent=ConfigurationAntiAim,valuename='aasmooth',title='Turn Smoothne
 
 addscroll({parent=ConfigurationAntiAim,valuename='aaspeed',title='Spin Speed',maxed=100000,value=0},function(y)	end)
 
-addscroll({parent=ConfigurationAntiAim,valuename='downscale',title='Down Scale',maxed=100,value=0},function(y)
-	game.ReplicatedStorage.Events.ControlTurn:FireServer(-((y*0.05) + 0.96247750520706))
-end)
-
 local CharacterAntiAim = addcategory({parent=FIRST_antiaim,title='General',lenght=140})
 
-addbutton({parent=TrollRage,text='Invisible'},function()
+addtoggle({parent=TrollRage,title='Invisible',valuename='invisiblecharacter'}, function(bruh) end)
+
+
+--[[addbutton({parent=TrollRage,text='Invisible'},function()
 	InitiateAA()
 end)
-
+--]]
 --[[addbutton({parent=TrollRage,text='Unhittable (buggy)'},function()
 	if lplr.Character and not lplr:FindFirstChild('XDDLA') then
 		Instance.new('Sky',lplr.Character).Name = 'XDDLA'
@@ -1400,6 +1813,7 @@ addtoggle({parent=CharacterAntiAim,title='Down',valuename='down'}, function(bruh
 
 addtoggle({parent=CharacterAntiAim,title='Yaw',valuename='yaw'}, function(bruh) end)
 
+
 adddropdown({parent=CharacterAntiAim,valuename='yawtype',list={'Keybind','Jitter','Reversed','Manual','Spin'}},function(y)
 	
 end)
@@ -1408,6 +1822,8 @@ addscroll({parent=CharacterAntiAim,valuename='yawmanual',title='Yaw',maxed=300,v
 end)
 
 local WorldVisuals = addcategory({parent=visual_4,title='Environment',lenght=100})
+
+
 
 addtoggle({parent=CharacterAntiAim,title='Global Shadows',valuename='globalshadows'}, function(bruh) 
 	game.Lighting.GlobalShadows = bruh
@@ -1436,16 +1852,13 @@ addtoggle({parent=WorldVisuals,title='Nightmode',valuename='nightmode'},function
 			while _G['property_nightmode'] == true do
 				game:GetService("Lighting").Brightness = 0
 				game:GetService("Lighting").TimeOfDay = 0
-				wait(1)
+				rs.Heartbeat:wait()
 			end
 		end)
 	else
 		game:GetService("Lighting").Brightness = oldbrightness
 		game:GetService("Lighting").TimeOfDay = oldtime
 	end
-end)
-addscroll({parent=WorldVisuals,valuename='brightness',title='Brightness',maxed=100,value=0},function(y)
-	CC.Brightness = y/100
 end)
 addscroll({parent=WorldVisuals,valuename='contrast',title='Contrast',maxed=100,value=0},function(y)
 	CC.Contrast = y/100
@@ -1530,32 +1943,60 @@ addtoggle({parent=ESPVisuals_Friendlies,title='Chams',valuename='teamchams'},fun
 	
 end)
 
-local ESPVisuals_Enemies = addcategory({parent=visual_2,title='ESP',lenght=100})
+
+local ESPVisuals_Enemies = addcategory({parent=visual_2,title='ESP',lenght=150})
 
 addtoggle({parent=ESPVisuals_Enemies,title='Box',valuename='boxesp'},function(callback)
 	
 end)
+
+addtoggle({parent=ESPVisuals_Enemies,title='Glow (unfinished)',valuename='glowesp'},function(callback)
+	
+end)
+
 addtoggle({parent=ESPVisuals_Enemies,title='Name',valuename='nameesp'},function(callback)
 	
 end)
 
-addtoggle({parent=ESPVisuals_Enemies,title='Chams',valuename='enemychams'},function(callback)
+addtoggle({parent=ESPVisuals_Enemies,title='Health (unfinished)',valuename='healthesp'},function(callback)
+	
+end)
+addtoggle({parent=ESPVisuals_Enemies,title='Health color overide (unfinished)',valuename='healthespcolor'},function(callback)
+	
+end)
+addtoggle({parent=ESPVisuals_Enemies,title='Taser range (unfinished)',valuename='taserrangeesp'},function(callback)
+	
+end)
+addtoggle({parent=ESPVisuals_Enemies,title='Knife range (unfinished)',valuename='kniferangeesp'},function(callback)
+	
+end)
+local toggle_enemytracers = addtoggle({parent=ESPVisuals_Enemies,title='Tracers',valuename='enemytracers'},function(callback)
+	
+end)
+addcolorselectionbutton({valuename = 'enemytracercolor',parent = toggle_enemytracers},function(callback)
+	
+end)
+local ChamsVisuals_Enemies = addcategory({parent=visual_2,title='Chams',lenght=100})
+
+local toggle_enemychams = addtoggle({parent=ChamsVisuals_Enemies,title='Chams',valuename='enemychams'},function(callback)
+	
+end)
+local toggle_enemybone = addtoggle({parent=ChamsVisuals_Enemies,title='Bone',valuename='enemybone'},function(callback)
 	
 end)
 
-addtoggle({parent=ESPVisuals_Enemies,title='Footstep',valuename='footstepesp'},function(callback)
+addcolorselectionbutton({valuename = 'enemychamscolor',parent = toggle_enemychams},function(callback)
+	
+end)
+addcolorselectionbutton({valuename = 'enemybonecolor',parent = toggle_enemychams},function(callback)
 	
 end)
 
-addscroll({parent=ESPVisuals_Enemies,valuename='chamtransparency',title='Chams Transparency',maxed=100,value=0},function(y)	end)
+addscroll({parent=ChamsVisuals_Enemies,valuename='chamtransparency',title='Cham Transparency',maxed=100,value=0},function(y)	end)
+addscroll({parent=ChamsVisuals_Enemies,valuename='bonetransparency',title='Bone Transparency',maxed=100,value=0},function(y)	end)
 
-addtoggle({parent=ESPVisuals_Enemies,title='Beam On Shot',valuename='beam'},function(callback)
 
-end)
 
-addtoggle({parent=ESPVisuals_Enemies,title='Hit Block',valuename='hitblock'},function(callback)
-
-end)
 
 local PerformanceMisc_Performace = addcategory({parent=misc_2,title='Performance',lenght=100})
 addtoggle({parent=PerformanceMisc_Performace,title='Disable bullet holes',valuename='disablebulletholes'},function(callback)
@@ -1596,10 +2037,13 @@ end)
 local InformationMisc_Performance = addcategory({parent=misc_2,title='Information',lenght=100})
 
 addbutton({parent=InformationMisc_Performance,text='RAGE QUIT!'},function()
-	game.Players.LocalPlayer:Kick('useless button rite :/')
+	game.Players.LocalPlayer:Kick('you clicked rage quit button lol!!!!!!')
 end)
 
 addtoggle({parent=PerformanceMisc_Performace,title='Spectator Lag',valuename='spectatelag'},function(callback)end)
+addscroll({parent=SoundMisc_Performance,valuename='spectatelagrate',title='Spectator Lag Rate',maxed=200,value=100},function(y) end)
+
+
 local watermark = Instance.new("ImageLabel")
 local watermark_2 = Instance.new("ImageLabel")
 local title = Instance.new("TextLabel")
@@ -1703,6 +2147,10 @@ spectatornames.TextYAlignment = Enum.TextYAlignment.Top
 addtoggle({parent=InformationMisc_Performance,title='Spectator list',valuename='spectatorlist'},function(callback)
 	spectatorlist.Visible = callback
 end)
+addtoggle({parent=InformationMisc_Performance,title='Logs',valuename='logs'},function(callback)
+	logs.Visible = callback
+end)
+
 local keybindstate = Instance.new("ImageLabel")
 local keybindstatebody = Instance.new("ImageLabel")
 local title = Instance.new("TextLabel")
@@ -1770,16 +2218,47 @@ addbutton({parent=InventoryMisc_Skins,text='Unlock All'},function()
 	local a=game.Players.LocalPlayer;local b;local c;local d;local e;if not syn then while true do end end;local f;local g=getsenv(game.Players.LocalPlayer.PlayerGui.Client)local h=game.ReplicatedStorage;local i=getrawmetatable(game)local j=i.__namecall;setreadonly(i,false)i.__namecall=newcclosure(function(self,...)local k=getnamecallmethod()local l={...}if k=="FireServer"and string.len(self.Name)==38 then return nil end;return j(self,...)end)setreadonly(i,true)local m={}local n={}local o={}local p={}local q={}for r,s in pairs(h.Skins:GetChildren())do for t,u in pairs(s:GetChildren())do table.insert(m,{s.Name.."_"..u.Name})end end;for r,s in pairs(h.Gloves:GetChildren())do if s.Name=="Wraps"or s.Name=="Guts"or s.Name=="MMA"or s.Name=="Wetland"or s.Name=="Ghoul Hex"or s.Name=="Phantom Hex"or s.Name=="Spector Hex"or s.Name=="Orange Hex"or s.Name=="Purple Hex"or s.Name=="Green Hex"then table.insert(o,{s.Name})end end;for r,s in pairs(h.Gloves:GetChildren())do if s.Name=="Scapter"or s.Name=="Patch"or s.Name=="Digital"or s.Name=="Crystal"then table.insert(q,{s.Name})end end;for r,s in pairs(h.Gloves:GetChildren())do if s.Name=="Hazard"or s.Name=="Hallows"or s.Name=="Majesty"or s.Name=="Royal"or s.Name=="Weeb"or s.Name=="CottonTail"or s.Name=="RSL"then table.insert(p,{s.Name})end end;for r,s in pairs(h.Gloves:GetChildren())do if s.Name=="Grim"or s.Name=="Wisk"or s.Name=="Molten"or s.Name=="Kringle"then table.insert(n,{s.Name})end end;for r=1,#n do table.insert(m,{"Strapped Glove_"..unpack(n[r])})end;for r=1,#p do table.insert(m,{"Sports Glove_"..unpack(p[r])})end;for r=1,#q do table.insert(m,{"Fingerless Glove_"..unpack(q[r])})end;for r=1,#o do table.insert(m,{"Handwraps_"..unpack(o[r])})end;table.insert(m,{"CTKnife_Stock"})table.insert(m,{"TKnife_Stock"})for r,s in pairs(h.Skins:GetChildren())do if s.Name~="Flip Knife"and s.Name~="Bayonet"and s.Name~="Falchion Knife"and s.Name~="Karambit"and s.Name~="Huntsman Knife"and s.Name~="Banana"and s.Name~="Butterfly Knife"then table.insert(m,{s.Name.."_Stock"})end end;g.CurrentInventory=m;local v=game.Players.LocalPlayer.SkinFolder.TFolder:Clone()local w=game.Players.LocalPlayer.SkinFolder.CTFolder:Clone()v.Parent=game.Players.LocalPlayer.SkinFolder;w.Parent=game.Players.LocalPlayer.SkinFolder;wait(1)game.Players.LocalPlayer.SkinFolder.TFolder:Destroy()game.Players.LocalPlayer.SkinFolder.CTFolder:Destroy()local x=getrawmetatable(game)local y=x.__namecall;setreadonly(x,false)local z;local A;local B;x.__namecall=newcclosure(function(self,...)local k=getnamecallmethod()local l={...}if k=="FireServer"and self.Name=="DataEvent"then for r,s in next,l do B=s[2]A=s[3]table.foreach(s[4],function(C,s)z=s;print(B,A,z)end)local D=game.Players.LocalPlayer.SkinFolder.CTFolder;local E=game.Players.LocalPlayer.SkinFolder.TFolder;if B=="CT"or B=="Both"then for t,u in pairs(D:GetChildren())do if A=='Gut Knife'or A=='Butterfly Knife'or A=='Falchion Knife'or A=='Bayonet'or A=='Huntsman Knife'or A=='Karambit'or A=='Banana'or A=='Flip Knife'or A=='Bearded Axe'or A=='Sickle'or A=='Cleaver'and u.Name=="Knife"then local F=string.split(z,"_")u.Value=tostring(F[2])elseif u.Name==A then local F=string.split(z,"_")u.Value=tostring(F[2])end end end;if B=="T"or B=="Both"then for G,H in pairs(E:GetChildren())do if A=='Gut Knife'or A=='Butterfly Knife'or A=='Falchion Knife'or A=='Bayonet'or A=='Huntsman Knife'or A=='Karambit'or A=='Banana'or A=='Flip Knife'or A=='Bearded Axe'or A=='Sickle'or A=='Cleaver'and H.Name=="Knife"then local F=string.split(z,"_")H.Value=tostring(F[2])elseif H.Name==A then local F=string.split(z,"_")H.Value=tostring(F[2])end end end end end;return y(self,...)end)setreadonly(x,true)
 end)
 
-local ViewmodelVisuals = addcategory({parent=misc_3,title='View Model',lenght=100})
+local ViewmodelVisuals = addcategory({parent=misc_3,title='View Model',lenght=150})
 
-addscroll({parent=ViewmodelVisuals,valuename='armtransparency',title='Arms Transparency',maxed=100,value=0},function(y)	end)
+addbutton({parent=ViewmodelVisuals,text='Reset Offsets'},function()
+	configfolder.xoffsetviewmodel.Value = 500
+	configfolder.yoffsetviewmodel.Value = 500
+	configfolder.zoffsetviewmodel.Value = 500
+	configfolder.rolloffsetviewmodel.Value = 500
+end)
+
+addscroll({parent=ViewmodelVisuals,valuename='xoffsetviewmodel',title='X offset',maxed=1000,value=500},function(y)	
+end)
+addscroll({parent=ViewmodelVisuals,valuename='yoffsetviewmodel',title='Y offset',maxed=1000,value=500},function(y)	
+end)
+addscroll({parent=ViewmodelVisuals,valuename='zoffsetviewmodel',title='Z offset',maxed=1000,value=500},function(y)	
+end)
+addscroll({parent=ViewmodelVisuals,valuename='rolloffsetviewmodel',title='Roll',maxed=1000,value=500},function(y)	
+end)
+
+addscroll({parent=ViewmodelVisuals,valuename='armtransparency',title='Arms Transparency',maxed=100,value=0},function(y)	
+	spawn(function()
+		local ArmModel = workspace.CurrentCamera:FindFirstChild('Arms')
+		if ArmModel then
+			for i,v in pairs(ArmModel:GetDescendants()) do 
+				if v:IsA("BasePart") and v.Transparency ~= 1 then 
+					v.Transparency = (_G['property_armtransparency']/100)-0.001
+				end
+				rs.Heartbeat:wait()
+			end
+		end
+	end)
+end)
 
 
 local ESPVisuals_Self = addcategory({parent=visual_1,title='Effects',lenght=100})
-addtoggle({parent=ESPVisuals_Self,title='Knife range',valuename='kniferange'},function(callback)
+local toggle_kniferange = addtoggle({parent=ESPVisuals_Self,title='Knife Range',valuename='kniferange'},function(callback)
 	
 end)
-addtoggle({parent=ESPVisuals_Self,title='No scope',valuename='scopeviewenchancer'},function(callback)
+addcolorselectionbutton({valuename = 'kniferangecolor',parent = toggle_kniferange},function(callback)
+	
+end)
+addtoggle({parent=ESPVisuals_Self,title='No Scope',valuename='scopeviewenchancer'},function(callback)
 	if callback == true then
 		game:GetService("Players").LocalPlayer.PlayerGui.GUI.Crosshairs.Scope.ImageTransparency = 1
 		game:GetService("Players").LocalPlayer.PlayerGui.GUI.Crosshairs.Frame1.BackgroundTransparency = 1
@@ -1794,15 +2273,24 @@ addtoggle({parent=ESPVisuals_Self,title='No scope',valuename='scopeviewenchancer
 		game:GetService("Players").LocalPlayer.PlayerGui.GUI.Crosshairs.Frame4.BackgroundTransparency = 0
 	end
 end)
-addtoggle({parent=ESPVisuals_Self,title='No flash',valuename='tps'},function(callback)
+addtoggle({parent=ESPVisuals_Self,title='No Flash',valuename='noflash'},function(callback)
 	lplr.PlayerGui.Blnd.Blind.Visible = (not callback)
 end)
-addtoggle({parent=ESPVisuals_Self,title='Thirdperson mode',valuename='tps'},function(callback)
+addtoggle({parent=ESPVisuals_Self,title='Thirdperson Mode',valuename='tps'},function(callback)
 end)
+addscroll({parent=ESPVisuals_Self,valuename='tpsdistance',title='Thirdperson Distance',maxed=200,value=0},function(y)	end)
 
 local MapVisuals_World = addcategory({parent=visual_4,title='Map',lenght=100})
 
 local EntitiesVisuals_World = addcategory({parent=visual_4,title='Entities',lenght=80})
+
+addtoggle({parent=EntitiesVisuals_World,title='Bullet Tracer',valuename='beam'},function(callback)
+
+end)
+
+addtoggle({parent= EntitiesVisuals_World,title='Hit Block',valuename='hitblock'},function(callback)
+
+end)
 
 addtoggle({parent=EntitiesVisuals_World,title='Bomb esp',valuename='bombesp'},function(callback)
 end)
@@ -1816,12 +2304,12 @@ end)
 local ViewVisuals_World = addcategory({parent=visual_4,title='View',lenght=100})
 
 addscroll({parent=ViewVisuals_World,valuename='fieldofview',title='Field Of View',maxed=45,value=0},function(y)	end)
-
 spawn(function()
-	while wait(.5) do
+	while true do
 		for i,v in pairs(configfolder:GetChildren()) do
 			_G['property_'..v.Name] = v.Value
 		end
+		rs.Heartbeat:wait()
 	end
 end)
 
@@ -1859,15 +2347,17 @@ local cangivecframe = 0
 
 local backtrackfolder = Instance.new('Folder',workspace)
 backtrackfolder.Name = 'backtrackfolder'
-
+_G['property_spectatelagrate'] = 50
 local fakeanim = Instance.new('Animation',workspace)
 fakeanim.AnimationId = 'rbxassetid://0'
 local lplr = game:GetService("Players").LocalPlayer
 mt.__namecall = newClose(function(...)
 	   local method = namecallMethod()
 	   local args = {...}
-	   if method == "FindPartOnRayWithIgnoreList" then
-			table.insert(args[3],backtrackfolder)
+	   if method == "SetPrimaryPartCFrame" then
+			args[2] = args[2] * CFrame.new((_G['property_xoffsetviewmodel']/500)-1,(_G['property_yoffsetviewmodel']/500)-1,(_G['property_zoffsetviewmodel']/500)-1)  * CFrame.Angles(0,0,(_G['property_rolloffsetviewmodel']/500)-1) --* CFrame.Angles(0,0,_G['property_rolloffsetviewmodel']/250)
+	   elseif method == "FindPartOnRayWithIgnoreList" then
+			--table.insert(args[3],backtrackfolder)
 			if target and lplr.Character and _G['property_silentaim'] == true then
 				args[2] = Ray.new(workspace.CurrentCamera.CFrame.Position, (target[bodyname].CFrame.p - workspace.CurrentCamera.CFrame.Position).unit * 500)
 			elseif _G['property_nospread'] == true then
@@ -1880,30 +2370,33 @@ mt.__namecall = newClose(function(...)
 		elseif tostring(method) == "FireServer" and tostring(args[1]) == "ReplicateCamera" then
 			if _G['property_spectatelag'] == true then
 				cangivecframe = cangivecframe + 1
-				if cangivecframe ~= 50 then
+				if cangivecframe ~= (_G['property_spectatelagrate'] or 50) then
 					return wait(99e99)
 				else
 					cangivecframe = 0
 				end
 			end
 			if _G['property_tps'] == true then
-					if lplr.Character then
-						if latestshot then
-							args[2] = CFrame.new(lplr.Character.Head.CFrame.p, latestshot)
-							latestshot = nil
-						else
-							args[2] = lplr.Character.Head.CFrame
-						end
+				if lplr.Character then
+					if latestshot then
+						args[2] = CFrame.new(lplr.Character.Head.CFrame.p, latestshot)
+						latestshot = nil
+					else
+						args[2] = lplr.Character.Head.CFrame
 					end
 				end
+			end
 		elseif tostring(method) == "FireServer" and tostring(args[1]) == "HitPart" then
+			spawn(function()
+				if args[2] and game.Players:FindFirstChild(args[2].Parent.Name) then
+					--warn('hurt '..args[2].Parent.Name)
+					logs.Text = logs.Text..'\nhurt '..args[2].Parent.Name..' for '.. game:GetService('ReplicatedStorage').Weapons[args[4]]['DMG'].Value * args[9]
+				end
+			end)
 			if _G['property_instantkill'] == true then
 				args[9] = 10
 			end
-			if m.Target and m.Target.Name == 'backtrackPART' and 0 < m.Target.thing.Value.Humanoid.Health then
-				args[2] = m.Target.thing.Value.Head
-				args[3] = m.Target.thing.Value.Head.CFrame.p
-			end
+
 			spawn(function()
 				if _G['property_hitblock'] == true then
 					smallblock(args[3])
@@ -1930,7 +2423,7 @@ mt.__namecall = newClose(function(...)
 			end
 		elseif tostring(method) == "FireServer" and tostring(args[1]) == "ControlTurn" then
 			if _G['property_down'] == true then
-				args[2] = -((_G['property_downscale']*0.05) + 0.96247750520706)
+				args[2] = -0.96247750520706
 			end
 		elseif tostring(method) == "FireServer" and tostring(args[1]) == "PlayerChatted" then
 			if _G['property_chatbypass'] == true then
@@ -1993,43 +2486,19 @@ function gettarget()
 						end
 					end
 				end
+				if m.Target then
+					if m.Target.Name == 'BACKTRACKPart' then
+						nearestcharacter = m.Target.thing.Value
+					end
+				end
 		end
 	end)
 	return nearestcharacter
 end
 _G['property_fieldofview'] = 0
+local justopened = false
 local spaceheld = false
-game:GetService("RunService").RenderStepped:connect(function()
-	if _G['property_tps'] == true then
-		game.Players.LocalPlayer.CameraMaxZoomDistance = 12
-		game.Players.LocalPlayer.CameraMinZoomDistance = 12
-	end
-	if spaceheld == true then
-		if lplr.Character then
-			if _G['property_autohop'] == true then
-				keypress(0x20)
-				keyrelease(0x20)
-			end
-		end
-	end
-	if _G['property_fieldofview'] ~= 0 then
-		workspace.CurrentCamera.FieldOfView = _G['property_fieldofview'] + 75
-	end
-	local xd = math.random(0,100);
-	if (_G['property_headshothitchance'] or 0) <= xd then 
-		bodyname = 'UpperTorso'
-	elseif (_G['property_bodyhitchance'] or 0) >= xd then
-		bodyname = 'Head'
-	else
-		bodyname = 'Head'
-	end
-	local yeet = gettarget()
-	if yeet then
-		target = yeet
-	else
-		target = nil
-	end
-end)
+
 
 _G.keydownawsd = 'a'
 game:GetService("RunService").RenderStepped:Connect(function()
@@ -2083,7 +2552,6 @@ keyboard.KeyDown:Connect(function(key)
 end)
 
 local draggable = function(gui)
-    local UserInputService = game:GetService("UserInputService")
 	local dragging
 	local dragInput
 	local dragStart
@@ -2091,8 +2559,10 @@ local draggable = function(gui)
 	
 	local function update(input)
 		if not scrollon then
-			local delta = input.Position - dragStart
-			gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+			if selectingcolor == false then
+				local delta = input.Position - dragStart
+				gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+			end
 		end
 	end
 	
@@ -2122,12 +2592,13 @@ local draggable = function(gui)
 		end
 	end)
 end
-
 function createnewconfig()
 	local r = "return {"
 	for i,v in pairs(configfolder:GetChildren()) do
 		if v:IsA("StringValue") then
 			r = r.." {name='"..v.Name.."';value='"..v.Value.."'};"
+		elseif v:IsA("Color3Value") then
+			r = r.." {name='"..v.Name.."';value=Color3.fromHSV(".. tostring(v.Value) ..")};"
 		else
 			r = r.." {name='"..v.Name.."';value=".. tostring(v.Value) .."};"
 		end
@@ -2202,7 +2673,27 @@ configlist.ChildAdded:Connect(function(c)
 		end)
 	end)
 end)
-
+function saverecoveryfile()
+	local code = createnewconfig()
+	writefile('recovery_bloxtap.txt',code)
+end
+function setrecoveryfile()
+	local a,b = pcall(function()
+		readfile('recovery_bloxtap.txt')
+	end)
+	if not string.find(b or "",'not exist') then 
+		local code = readfile('recovery_bloxtap.txt')
+		local configlist = loadstring(code)()
+		for _,con in pairs(configlist) do
+			for _,obj in pairs(configfolder:GetChildren()) do
+				if obj.Name == con['name'] then
+					obj.Value = con['value']
+					break
+				end
+			end
+		end
+	end
+end
 function checkfile()
 	local a,b = pcall(function()
 		readfile('config_bloxtap.txt')
@@ -2373,124 +2864,133 @@ function footstepespcharacter(character)
 	tween:Play()
 	game.Debris:AddItem(footstepesp,1)
 end
+
+function tracerESP(character)
+	local x = Drawing.new('Line')
+	local ABS = Instance.new("ScreenGui",game.Players.LocalPlayer.PlayerGui).AbsoluteSize
+	x.Visible = true
+	x.From = Vector2.new(ABS.X/2,ABS.Y+30);
+	x.Color = Color3.fromRGB(255,255,255);
+	x.Thickness = 1
+	local localfunc;
+	localfunc = character.ChildRemoved:Connect(function(x)
+		spawn(function()
+			if x.Name == 'tracers' then
+				x:Remove()
+				localfunc:disconnect()
+			end
+		end)
+	end)
+	local brt = configfolder:FindFirstChild('enemytracercolor')
+	spawn(function()
+		while character:FindFirstAncestorWhichIsA("Workspace") do
+			local a,b = pcall(function()
+			local camera = workspace.CurrentCamera
+			local worldPoint = character:FindFirstChild('HumanoidRootPart').CFrame.p
+			local vector, onScreen = camera:WorldToScreenPoint(worldPoint)
+			
+			local screenPoint = Vector2.new(vector.X, vector.Y)
+			x.Visible = onScreen or false;
+			x.To = screenPoint;
+			--pcall(function()
+				local colorval = loadstring(_G['property_enemytracercolor'])
+				local color = Color3.fromHSV(colorval[1],colorval[2],colorval[3]) -- attempt to index function with number
+				x.Color = color
+			--end)
+			end)
+			rs.Heartbeat:wait()
+			if b then
+				break
+			end
+		end
+		x.Visible = false;
+		x:Remove()
+	end)
+end
+-- nameESP(game.Players.chrismanu.Character)
 function boxespweapon(droppedgun)
-	local box_ESP = Instance.new("BillboardGui")
-	local yes1 = Instance.new("Frame")
-	local yes2 = Instance.new("Frame")
-	local yes3 = Instance.new("Frame")
-	local yes4 = Instance.new("Frame")
-	local yes5 = Instance.new("Frame")
-	
-	box_ESP.Name = "box_ESP"
-	box_ESP.Parent = droppedgun
-	box_ESP.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	box_ESP.Active = true
-	box_ESP.AlwaysOnTop = true
-	box_ESP.LightInfluence = 1
-	box_ESP.MaxDistance = 150
-	box_ESP.Size = UDim2.new(2, 0, 2, 0)
-	
-	yes1.Name = "yes1"
-	yes1.Parent = box_ESP
-	yes1.BackgroundColor3 = Color3.new(1, 1, 1)
-	yes1.BackgroundTransparency = 1
-	yes1.Size = UDim2.new(1, 0, 1, 0)
-	
-	yes2.Name = "yes2"
-	yes2.Parent = yes1
-	yes2.BackgroundColor3 = Color3.new(1, 1, 1)
-	yes2.BorderSizePixel = 0
-	yes2.Size = UDim2.new(0, 1, 1, 0)
-	
-	yes3.Name = "yes3"
-	yes3.Parent = yes1
-	yes3.BackgroundColor3 = Color3.new(1, 1, 1)
-	yes3.BorderSizePixel = 0
-	yes3.Position = UDim2.new(1, -1, 0, 0)
-	yes3.Size = UDim2.new(0, 1, 1, 0)
-	
-	yes4.Name = "yes4"
-	yes4.Parent = yes1
-	yes4.BackgroundColor3 = Color3.new(1, 1, 1)
-	yes4.BorderSizePixel = 0
-	yes4.Size = UDim2.new(1, 0, 0, 1)
-	
-	yes5.Name = "yes5"
-	yes5.Parent = yes1
-	yes5.BackgroundColor3 = Color3.new(1, 1, 1)
-	yes5.BorderSizePixel = 0
-	yes5.Position = UDim2.new(0, 0, 1, -1)
-	yes5.Size = UDim2.new(1, 0, 0, 1)
+	local latestparent = droppedgun.Parent
+	local model = Instance.new('Model',workspace)
+	droppedgun.Parent = model
+	wait()
+	local size = model:GetExtentsSize()
+	local cham = Instance.new("BoxHandleAdornment",droppedgun)
+	cham.Color3 = Color3.fromRGB(255,0,0)
+	cham.AlwaysOnTop = true
+	cham.Size = size
+	cham.ZIndex = 1
+	cham.Adornee = droppedgun
+	cham.Transparency = 0.5
+	droppedgun.Parent = latestparent
+	model:Destroy()
 end
 function boxesp(character)
 	if not character:FindFirstChild("box_ESP") then
-		local box_ESP = Instance.new("BillboardGui")
-		local yes1 = Instance.new("Frame")
-		local yes2 = Instance.new("Frame")
-		local yes3 = Instance.new("Frame")
-		local yes4 = Instance.new("Frame")
-		local yes5 = Instance.new("Frame")
+		local espframe = Instance.new("BillboardGui")
+		local box = Instance.new("Frame")
+		local a = Instance.new("Frame")
+		local a_2 = Instance.new("Frame")
+		local a_3 = Instance.new("Frame")
+		local a_4 = Instance.new("Frame")
+		espframe.Name = "box_ESP"
+		espframe.Parent = character
+		espframe.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		espframe.Active = true
+		espframe.AlwaysOnTop = true
+		espframe.LightInfluence = 1
+		espframe.MaxDistance = 100
+		espframe.Size = UDim2.new(4.5, 0, 6, 0)
 		
-		box_ESP.Name = "box_ESP"
-		box_ESP.Parent = character
-		box_ESP.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-		box_ESP.Active = true
-		box_ESP.AlwaysOnTop = true
-		box_ESP.LightInfluence = 1
-		box_ESP.MaxDistance = 150
-		box_ESP.Size = UDim2.new(4, 0, 5.19999981, 0)
+		box.Name = "box"
+		box.Parent = espframe
+		box.BackgroundColor3 = Color3.new(1, 1, 1)
+		box.BackgroundTransparency = 1
+		box.Position = UDim2.new(0.0250000004, 0, 0.0500000007, 0)
+		box.Size = UDim2.new(0.949999988, 0, 0.870000005, 0)
 		
-		yes1.Name = "yes1"
-		yes1.Parent = box_ESP
-		yes1.BackgroundColor3 = Color3.new(1, 1, 1)
-		yes1.BackgroundTransparency = 1
-		yes1.Size = UDim2.new(1, 0, 1, 0)
+		a.Name = "a"
+		a.Parent = box
+		a.BackgroundColor3 = Color3.new(1, 1, 1)
+		a.BorderColor3 = Color3.new(0.196078, 0.196078, 0.196078)
+		a.Position = UDim2.new(0, 2, 0, 1)
+		a.Size = UDim2.new(1, -4, 0, 1)
 		
-		yes2.Name = "yes2"
-		yes2.Parent = yes1
-		yes2.BackgroundColor3 = Color3.new(1, 1, 1)
-		yes2.BorderSizePixel = 0
-		yes2.Size = UDim2.new(0, 1, 1, 0)
+		a_2.Name = "a"
+		a_2.Parent = box
+		a_2.BackgroundColor3 = Color3.new(1, 1, 1)
+		a_2.BorderColor3 = Color3.new(0.196078, 0.196078, 0.196078)
+		a_2.Position = UDim2.new(0, 2, 1, -2)
+		a_2.Size = UDim2.new(1, -4, 0, 1)
 		
-		yes3.Name = "yes3"
-		yes3.Parent = yes1
-		yes3.BackgroundColor3 = Color3.new(1, 1, 1)
-		yes3.BorderSizePixel = 0
-		yes3.Position = UDim2.new(1, -1, 0, 0)
-		yes3.Size = UDim2.new(0, 1, 1, 0)
+		a_3.Name = "a"
+		a_3.Parent = box
+		a_3.BackgroundColor3 = Color3.new(1, 1, 1)
+		a_3.BorderColor3 = Color3.new(0.196078, 0.196078, 0.196078)
+		a_3.Position = UDim2.new(1, -2, 0, 1)
+		a_3.Size = UDim2.new(0, 1, 1, -2)
 		
-		yes4.Name = "yes4"
-		yes4.Parent = yes1
-		yes4.BackgroundColor3 = Color3.new(1, 1, 1)
-		yes4.BorderSizePixel = 0
-		yes4.Size = UDim2.new(1, 0, 0, 1)
-		
-		yes5.Name = "yes5"
-		yes5.Parent = yes1
-		yes5.BackgroundColor3 = Color3.new(1, 1, 1)
-		yes5.BorderSizePixel = 0
-		yes5.Position = UDim2.new(0, 0, 1, -1)
-		yes5.Size = UDim2.new(1, 0, 0, 1)
-		spawn(function() while box_ESP do
-			wait()
-			pcall(function()
-			yes2.BackgroundTransparency = _G['property_boxtransparency']/100
-			yes3.BackgroundTransparency = _G['property_boxtransparency']/100
-			yes4.BackgroundTransparency = _G['property_boxtransparency']/100
-			yes5.BackgroundTransparency = _G['property_boxtransparency']/100
-		end) end box_ESP:Destroy() end)
+		a_4.Name = "a"
+		a_4.Parent = box
+		a_4.BackgroundColor3 = Color3.new(1, 1, 1)
+		a_4.BorderColor3 = Color3.new(0.196078, 0.196078, 0.196078)
+		a_4.Position = UDim2.new(0, 1, 0, 1)
+		a_4.Size = UDim2.new(0, 1, 1, -2)
+		spawn(function() while espframe do
+			game:GetService("RunService").RenderStepped:wait()
+		end espframe:Destroy() end)
 	end
 end
 function backtrack(character)
 	pcall(function()
 		if not character:FindFirstChild("backtrack") then
 			Instance.new("Sky",character).Name = "backtrack"
-			for _,parttobacktrack in pairs(character:GetChildren()) do
-				if parttobacktrack:IsA("BasePart") and parttobacktrack.Name ~= 'Gun' then
+			--for _,parttobacktrack in pairs(character:GetChildren()) do
+				--if parttobacktrack:IsA("BasePart") and parttobacktrack.Name ~= 'Gun' then
+				local parttobacktrack = character.Head
 					spawn(function()
 						for i = 1, 10 do
-							local backtrackPART = Instance.new("Part",backtrackfolder)
-							backtrackPART.Size = parttobacktrack.Size
+							local backtrackPART = Instance.new("Part",workspace)
+							backtrackPART.Size = Vector3.new(2,2,2)
 							backtrackPART.Color = Color3.fromRGB(255,255,255)
 							backtrackPART.CanCollide = false
 							backtrackPART.Anchored = true
@@ -2502,28 +3002,104 @@ function backtrack(character)
 							thing.Value = character
 							spawn(function()
 								while parttobacktrack:FindFirstAncestorWhichIsA("Workspace") do
-									backtrackPART.CFrame = parttobacktrack.CFrame
-									wait(i * 0.02)
+									--backtrackPART.CFrame = parttobacktrack.CFrame
+									local tweenInfo = TweenInfo.new(
+										0.5, -- Time
+										Enum.EasingStyle.Quad,
+										Enum.EasingDirection.Out,
+										0,
+										false,
+										0
+									)
+									local TweenService = game:GetService("TweenService")
+									
+									local tween = TweenService:Create(backtrackPART, tweenInfo, {CFrame = parttobacktrack.CFrame})
+									 
+									tween:Play()
+									wait(i * 0.01)
 								end
 								backtrackPART:Destroy()
 							end)
 						end	
 					end)
-				end
-			end
+			--	end
+			--end
 		end
 	end)
 end
+--local viewportESP = Instance.new("ViewportFrame")
+--viewportESP.Size = UDim2.new(0.3, 0, 0.4, 0)
+--viewportESP.Position = UDim2.new(0, 15, 0, 15)
+--viewportESP.BackgroundColor3 = Color3.new(0, 0, 0)
+--viewportESP.BorderColor3 = Color3.new(0.6, 0.5, 0.4)
+--viewportESP.BorderSizePixel = 2
+--viewportESP.BackgroundTransparency = 0.25
+--viewportESP.Parent = bloxtap
+-- 
+--local part = Instance.new("Part")
+--part.Material = Enum.Material.Concrete
+--part.Color = Color3.new(0.25, 0.75, 1)
+--part.Position = Vector3.new(0, 0, 0)
+--part.Parent = viewportESP
+-- 
+--local viewportCamera = Instance.new("Camera")
+--viewportESP.CurrentCamera = viewportCamera
+--viewportCamera.Parent = viewportESP
+ 
+function chamESP(character,color)
+	if not character:FindFirstChild("Sky") then
+		Instance.new('Sky',character)
+		
+		-- getting clone parts
+		local clonedModel = Instance.new('Model',viewportESP)
+		for i,v in pairs(character:GetDescendants()) do
+			if v:IsA('BasePart') then
+				local new = v:Clone()
+				new.Parent = clonedModel
+				new:BreakJoints()
+				v:GetPropertyChangedSignal("Position"):Connect(function()
+					new.CFrame = v.CFrame
+				end)
+				v:GetPropertyChangedSignal("Parent"):Connect(function()
+					print("user "..character.Name..' character destroyed')
+				end)
+			end
+		end
+	end
+end
 function chams(character,color)
 	if not character:FindFirstChild("Sky") then
-		spawn(function() wait(2)
 		Instance.new('Sky',character)
-		for _,obj in pairs(character:GetDescendants()) do
+		spawn(function() wait(2)
+		for _,obj in pairs(character:GetChildren()) do
 			if obj:IsA("BasePart") and obj.Name ~= 'HumanoidRootPart' and obj.Name ~= 'Head' then
 				local cham = Instance.new("BoxHandleAdornment",obj)
 				cham.Color3 = color
 				cham.AlwaysOnTop = true
-				cham.Size = obj.Size
+				cham.Size = Vector3.new(0.25,obj.Size.Y,0.25)
+				cham.ZIndex = 1
+				cham.Adornee = obj
+				cham.Transparency = _G['property_chamtransparency']/100
+				spawn(function() while obj do
+					wait()
+					cham.Transparency = _G['property_chamtransparency']/100
+					local c = loadstring(_G['property_enemychamscolor'])()
+					cham.Color3 = Color3.fromHSV(c[1],c[2],c[3])
+				end cham:Destroy() end)
+			end
+		end end)
+	end
+end
+function boneESP(character,color)
+	if not character:FindFirstChild('Tool') then
+		spawn(function() wait(2)
+		Instance.new('Tool',character)
+		for _,obj in pairs(character:GetChildren()) do
+			if obj:IsA("BasePart") and obj.Name ~= 'HumanoidRootPart' and obj.Name ~= 'Head' then
+				local cham = Instance.new("BoxHandleAdornment",obj)
+				cham.Color3 = color
+				cham.AlwaysOnTop = true
+				cham.Size = Vector3.new(0.25,obj.Size.Y,0.25)
 				cham.ZIndex = 1
 				cham.Adornee = obj
 				cham.Transparency = _G['property_chamtransparency']/100
@@ -2545,6 +3121,9 @@ game.Players.LocalPlayer.CharacterAdded:connect(function(c)
 				end
 			end
 		end 
+		if _G['property_invisiblecharacter'] == true then
+			InitiateAA()
+		end
 		if _G['property_nocloth'] == true then
 			wait(1)
 			c:FindFirstChildOfClass('Shirt'):Destroy()
@@ -2553,14 +3132,7 @@ game.Players.LocalPlayer.CharacterAdded:connect(function(c)
 	end)
 end)
 spawn(function()
-	while wait(0.4) do
-		if spectatorlist.Visible == true then
-			spectatornames.Text = getspectators()
-		end
-	end
-end)
-spawn(function()
-	while wait(0.7) do
+	while wait(1) do
 		for _,player in pairs(game.Players:GetPlayers()) do
 			if player.Character then
 				if _G['property_weaponvolume'] ~= 0 then
@@ -2578,7 +3150,7 @@ spawn(function()
 				if player ~= game.Players.LocalPlayer then
 					if player.Team == game.Players.LocalPlayer.Team then
 						if _G['property_teamchams']	== true then
-							chams(player.Character,teamcolor)
+							chamESP(player.Character,teamcolor)
 						elseif player.Character:FindFirstChild("Sky") then
 							for i,v in pairs(player.Character:GetDescendants()) do
 								if v:IsA("BoxHandleAdornment") or v:IsA("Sky") then
@@ -2599,7 +3171,7 @@ spawn(function()
 					else
 						if _G['property_footstepesp'] == true then
 							pcall(function()
-								if player.Character.PrimaryPart.Velocity ~= Vector3.new(0,0,0) then
+								if player.Character.PrimaryPart.Velocity.Magnitude > 1 then
 									footstepespcharacter(player.Character)
 								end
 							end)
@@ -2618,15 +3190,41 @@ spawn(function()
 							player.Character:FindFirstChild("box_ESP"):Destroy()
 						end
 						if _G['property_nameesp'] == true then
-							nameesp(player.Character)
+							--nameesp(player.Character)
+							if not player.Character:FindFirstChild("name_ESP") then
+								local name_ESP = Instance.new('Folder')
+								name_ESP.Parent = player.Character
+								name_ESP.Name = 'name_ESP'
+								nameesp(player.Character)
+							end
 						elseif player.Character:FindFirstChild("name_ESP") then
 							player.Character:FindFirstChild("name_ESP"):Destroy()
 						end
+						if _G['property_enemytracers'] == true then
+							if not player.Character:FindFirstChild("tracers") then
+								local called = Instance.new('Folder')
+								called.Parent = player.Character
+								called.Name = 'tracers'
+								tracerESP(player.Character)
+							end
+						elseif player.Character:FindFirstChild("tracers") then
+							player.Character:FindFirstChild("tracers"):Destroy()
+						end
+						
 						if _G['property_enemychams'] == true then
-							chams(player.Character,enemycolor)
+							chamESP(player.Character,enemycolor)
 						elseif player.Character:FindFirstChild("Sky") then
 							for i,v in pairs(player.Character:GetDescendants()) do
 								if v:IsA("BoxHandleAdornment") or v:IsA("Sky") then
+									v:Destroy()
+								end
+							end
+						end	
+						if _G['property_enemybone'] == true then
+							boneESP(player.Character,enemycolor)
+						elseif player.Character:FindFirstChild("Tool") then
+							for i,v in pairs(player.Character:GetDescendants()) do
+								if v:IsA("BoxHandleAdornment") or v:IsA("Tool") then
 									v:Destroy()
 								end
 							end
@@ -2650,21 +3248,25 @@ spawn(function()
 							kniferange.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.p
 							kniferange.CanCollide = false
 							local bb = Instance.new("Decal",kniferange)
-							bb.Texture = 'http://www.roblox.com/asset/?id=107020846'
+							bb.Texture = 'http://www.roblox.com/asset/?id=2866648598'
 							bb.Face = 'Left'
-							local bb = Instance.new("Decal",kniferange)
-							bb.Texture = 'http://www.roblox.com/asset/?id=107020846'
-							bb.Face = 'Right'
-							kniferange.Massless = true
 							local XD = Instance.new("Weld", game.Players.LocalPlayer.Character.HumanoidRootPart)
 							XD.Part0 = XD.Parent
 							XD.Part1 = kniferange
 							XD.C0 = CFrame.Angles(0,0,1.6)
+							local colorval = loadstring(_G['property_kniferangecolor'])()
+							local color = Color3.fromHSV(colorval[1],colorval[2],colorval[3])
+							bb.Color3 = color
 						end
 					end
 				end
 			end
 		end
+		
+		spawn(function()latestCode = saverecoveryfile()end)
+		spawn(function() if spectatorlist.Visible == true then
+			spectatornames.Text = getspectators()
+		end end)
 	end
 end)
 function smallblock(pos)
@@ -2679,16 +3281,6 @@ function smallblock(pos)
 		game.Debris:AddItem(block,2)
 	end
 end
-function CheckRig()
-    if lplr.Character then
-        local Humanoid = lplr.Character:WaitForChild('Humanoid')
-        if Humanoid.RigType == Enum.HumanoidRigType.R15 then
-            return 'R15'
-        else
-            return 'R6'
-        end
-    end
-end
 function InitiateAA()
     local Character = lplr.Character
     local StoredCF = Character.PrimaryPart.CFrame
@@ -2701,16 +3293,10 @@ function InitiateAA()
 		wait(2)
         Part:Destroy()
     end)
-	if CheckRig() == 'R6' then
-        local Clone = Character.HumanoidRootPart:Clone()
-        Character.HumanoidRootPart:Destroy()
-        Clone.Parent = Character
-    else
-        local Clone = Character.LowerTorso.Root:Clone()
-        Character.LowerTorso.Root:Destroy()
-        Clone.Parent = Character.LowerTorso
-	end
-	wait()
+   	local Clone = Character.LowerTorso.Root:Clone()
+    Character.LowerTorso.Root:Destroy()
+    Clone.Parent = Character.LowerTorso
+	wait(0.1)
 	Character.PrimaryPart.CFrame = StoredCF
 end
 function beam(part,pos,yeeet)
@@ -2759,27 +3345,13 @@ local function Input(input, gameProcessedEvent)
 end
  
 UserInputService.InputBegan:Connect(Input)
-spawn(function()
-	while wait(0.3) do
-		if lplr.Character then
-			if _G['property_grenadewalk'] == true then
-				local oh1 = game:GetService("ReplicatedStorage").Weapons[_G['property_grenadewalktype']].Model
-				local oh3 = 25
-				local oh4 = 35
-				local oh6 = ""
-				local oh7 = ""
-				game:GetService("ReplicatedStorage").Events.ThrowGrenade:FireServer(oh1, nil, oh3, oh4, Vector3.new(0,-100,0), oh6, oh7)
-			end
-		end
-	end
-end)
 function getspectators()
 	local plrsspectating = ""
 	for i,v in pairs(game.Players:GetPlayers()) do 
 		pcall(function()
 			if v ~= lplr then
 				if not v.Character then 
-					if (v.CameraCF.Value.p - workspace.CurrentCamera.CFrame.p).Magnitude < 20 then 
+					if (v.CameraCF.Value.p - workspace.CurrentCamera.CFrame.p).Magnitude < 15 + lplr.CameraMaxZoomDistance then 
 						if plrsspectating == "" then
 							plrsspectating = v.Name
 						else
@@ -2793,7 +3365,7 @@ function getspectators()
 	return plrsspectating
 end
 spawn(function()
-	while wait(0.1) do
+	while true do
 		if _G['property_triggerbot'] == true then
 			if lplr.Character then
 				if m.Target then
@@ -2811,6 +3383,7 @@ spawn(function()
 				end
 			end
 		end
+		rs.Heartbeat:wait()
 	end
 end)
 _G['btn1down'] = false
@@ -2824,18 +3397,11 @@ end)
 workspace.CurrentCamera.ChildAdded:Connect(function(t)
 	spawn(function()
 		if t.Name == 'Arms' then
-			if _G['property_tps'] == true then
-				for i,v in pairs(t:GetDescendants()) do 
-					if v:IsA("BasePart") and v.Transparency ~= 1 then 
-						v.Transparency = 1
-					end
+			for i,v in pairs(t:GetDescendants()) do 
+				if v:IsA("BasePart") and v.Transparency ~= 1 then 
+					v.Transparency = (_G['property_armtransparency']/100)-0.001
 				end
-			else
-				for i,v in pairs(t:GetDescendants()) do 
-					if v:IsA("BasePart") and v.Transparency ~= 1 then 
-						v.Transparency = _G['property_armtransparency']/100
-					end
-				end
+				rs.Heartbeat:wait()
 			end
 		end
 	end)
@@ -2843,8 +3409,8 @@ end)
 
 m.KeyDown:Connect(function(k)
 	if string.byte(k) == 61 then
-		fovview.Visible = (not fovview.Visible)
 		main.Visible = (not main.Visible)
+		fovview.Visible = main.Visible
 		configmain.Visible = false
 	end
 end)
@@ -2852,6 +3418,7 @@ end)
 game.Players.PlayerRemoving:Connect(function(p)
 	if p == lplr then
 		savenewconfig()
+		saverecoveryfile()
 		if _G['property_autorejoin'] == true then
 			local ts = game:GetService("TeleportService")
 			local p = game:GetService("Players").LocalPlayer
@@ -2897,7 +3464,8 @@ end)
 game:GetService("Workspace")["Ray_Ignore"].Smokes.ChildAdded:connect(function(obj)
 	spawn(function() 
 		if _G['property_grenadesesp'] == true then
-			boxespweapon(obj)
+			--boxespweapon(obj)
+			nameesp(obj)
 		end
 	end)
 end)
@@ -2905,7 +3473,12 @@ local Space = Enum.KeyCode.Space
 local function Input(input, gameProcessedEvent)
 	if input.UserInputType == Enum.UserInputType.MouseButton3 then
 		if _G['property_tps'] == true then
-			configfolder.tps.Value = (not configfolder.tps.Value)
+			--configfolder.tps.Value = (not configfolder.tps.Value)
+			if lplr.CameraMode == Enum.CameraMode.Classic then
+				lplr.CameraMode = Enum.CameraMode.LockFirstPerson
+			else
+				lplr.CameraMode = Enum.CameraMode.Classic
+			end
 		end
 	end
 	if _G.autohop == true then
@@ -2916,6 +3489,39 @@ local function Input(input, gameProcessedEvent)
 		end
 	end
 end 
+game:GetService("RunService").RenderStepped:connect(function()
+	--viewportCamera.CFrame = workspace.CurrentCamera.CFrame
+	fovview.Position = ABS/2;
+	if _G['property_tps'] == true then
+		game.Players.LocalPlayer.CameraMaxZoomDistance = (_G['property_tpsdistance'] or 10)
+		game.Players.LocalPlayer.CameraMinZoomDistance = (_G['property_tpsdistance'] or 10)
+	end
+	if spaceheld == true then
+		if lplr.Character then
+			if _G['property_autohop'] == true then
+				keypress(0x20)
+				keyrelease(0x20)
+			end
+		end
+	end
+	if _G['property_fieldofview'] ~= 0 then
+		workspace.CurrentCamera.FieldOfView = _G['property_fieldofview'] + 75
+	end
+	local xd = math.random(0,100);
+	if (_G['property_headshothitchance'] or 0) <= xd then 
+		bodyname = 'UpperTorso'
+	elseif (_G['property_bodyhitchance'] or 0) >= xd then
+		bodyname = 'Head'
+	else
+		bodyname = 'Head'
+	end
+	local yeet = gettarget()
+	if yeet then
+		target = yeet
+	else
+		target = nil
+	end
+end)
 UserInputService.InputBegan:Connect(Input)
 draggable(main)
 draggable(configmain)
@@ -2924,3 +3530,5 @@ draggable(spectatorlist)
 username.Text = _G['bloxtapusername']
 
 loadsavedfileconfig()
+setrecoveryfile()
+-- bruhmod#5212
